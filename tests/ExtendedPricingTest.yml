@@ -1,0 +1,41 @@
+Member:
+  m1:
+    FirstName: Peter
+    Surname: Heck
+  m2:
+    FirstName: Jim
+    Surname: Beam
+
+Group:
+  g1:
+    Code: customers
+    Title: Customers
+    Members: =>Member.m1, =>Member.m2
+  g2:
+    Code: wholesale
+    Title: Wholesale Customers
+    Members: =>Member.m2
+
+ProductCategory:
+  c1:
+    Title: Test Category 1
+  c2:
+    Title: Test Category 2
+
+Product:
+  p1:
+    Title: Bottle of Whiskey
+    Parent: =>ProductCategory.c1
+    BasePrice: 27.50
+    CustomerPrice: 25.00
+    WholesalePrice: 20.00
+  p2:
+    Title: Box of Chocolates
+    Parent: =>ProductCategory.c1
+    BasePrice: 14.99
+  p3:
+    Title: Grassfed Beef
+    Parent: =>ProductCategory.c2
+    BasePrice: 25
+    CustomerPrice: 24
+

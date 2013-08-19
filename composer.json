@@ -1,0 +1,19 @@
+{
+	"name": "markguinn/silverstripe-shop-extendedpricing",
+	"description": "Submodule for Silverstripe Shop adding pricing levels based on group (wholesale, etc) and per-item sale pricing.",
+	"type": "silverstripe-module",
+	"keywords": ["silverstripe", "ecommerce", "shop", "pricing", "sale price", "wholesale"],
+	"license": "MIT",
+	"authors": [{
+		"name": "Mark Guinn",
+		"email": "mark@adaircreative.com",
+		"homepage": "http://github.com/markguinn"
+	}],
+	"extra": {
+		"installer-name": "shop_extendedpricing"
+	},
+	"require": {
+		"silverstripe/framework": "~3.1",
+		"burnbright/silverstripe-shop": "*"
+	}
+}
