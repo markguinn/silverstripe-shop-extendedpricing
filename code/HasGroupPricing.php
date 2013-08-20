@@ -46,12 +46,46 @@ class HasGroupPricing extends DataExtension
 	}
 
 	/**
+	 * Extracts out the field updating since that could happen at a couple
+	 * different extension points.
+	 * @param FieldList $fields
+	 */
+	protected function updateFields(FieldList $fields) {
+		foreach (self::get_levels() as $code => $fieldName) {
+			$newField = new TextField($fieldName, $this->getOwner()->fieldLabel($fieldName), '', 12);
+			if ($fields->hasTabSet()) {
+				$fields->addFieldToTab('Root.Pricing', $newField);
+			} else {
+				$fields->push($newField);
+			}
+		}
+	}
+
+	/**
 	 * @param FieldList $fields
 	 */
 	public function updateCMSFields(FieldList $fields) {
-		foreach (self::get_levels() as $code => $field) {
-			$fields->addFieldToTab('Root.Pricing', new TextField($field, $this->getOwner()->fieldLabel($field), '', 12));
+		// This is a little bit of a crazy hack to account for a pull request
+		// I've issued to the main shop module. Basically, the normal extension
+		// point for cms fields is called before any of the product-specific
+		// tabs are added, so when we add our fields to the Pricing tab, we
+		// have no control over placement - they're always at the top of the tab.
+		// I've added another extension point called updateProductCMSFields
+		// but there's no way to detect if it's present so we just check this
+		// config for now. At some point, this will be ubiquitous and we can
+		// just remove it [hopefully].
+		if (!Config::inst()->get(get_class($this->getOwner()), 'use_product_cms_extension_point')) {
+			$this->updateFields($fields);
 		}
+	}
+
+	/**
+	 * This is another extension point I added that is called AFTER all
+	 * the product-specific fields and tabs are in place.
+	 * @param FieldList $fields
+	 */
+	public function updateProductCMSFields(FieldList $fields) {
+		$this->updateFields($fields);
 	}
 
 	/**

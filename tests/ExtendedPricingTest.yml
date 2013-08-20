@@ -21,6 +21,11 @@ ProductCategory:
     Title: Test Category 1
   c2:
     Title: Test Category 2
+  c3:
+    Title: Test child
+    Parent: =>ProductCategory.c1
+  c4:
+    Title: Test Category Again
 
 Product:
   p1:
@@ -34,8 +39,58 @@ Product:
     Parent: =>ProductCategory.c1
     BasePrice: 14.99
   p3:
-    Title: Grassfed Beef
+    Title: Grassfed beef
     Parent: =>ProductCategory.c2
+    ProductCategories: =>ProductCategory.c3, =>ProductCategory.c4
     BasePrice: 25
     CustomerPrice: 24
+  p4:
+    Title: T-shirt
+    Parent: =>ProductCategory.c2
+    ProductCategories: =>ProductCategory.c1
+    BasePrice: 25
+    WholesalePrice: 23
 
+ProductAttributeType:
+  a1:
+    Name: Size
+    Label: Size
+  a2:
+    Name: Color
+    Label: Color
+
+ProductAttributeValue:
+  a1v1:
+    Value: Small
+    Type: =>ProductAttributeType.a1
+  a1v2:
+    Value: Large
+    Type: =>ProductAttributeType.a1
+  a2v1:
+    Value: Blue
+    Type: =>ProductAttributeType.a2
+  a2v2:
+    Value: Red
+    Type: =>ProductAttributeType.a2
+
+ProductVariation:
+  p4v1:
+    InternalItemID: abc123
+    Price: 20
+    WholesalePrice: 15
+    Product: =>Product.p4
+    AttributeValues: =>ProductAttributeValue.a1v1, =>ProductAttributeValue.a2v1
+  p4v2:
+    InternalItemID: abc456
+    Price: 22
+    Product: =>Product.p4
+    AttributeValues: =>ProductAttributeValue.a1v2, =>ProductAttributeValue.a2v1
+  p4v3:
+    InternalItemID: abc789
+    Product: =>Product.p4
+    AttributeValues: =>ProductAttributeValue.a1v1, =>ProductAttributeValue.a2v2
+  p4v4:
+    InternalItemID: abc10
+    Product: =>Product.p4
+    WholesalePrice: 10
+    AttributeValues: =>ProductAttributeValue.a1v2, =>ProductAttributeValue.a2v2

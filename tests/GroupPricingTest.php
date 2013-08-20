@@ -1,12 +1,12 @@
 <?php
 /**
- * Test "multi-price" features.
+ * Test group price level features.
  *
  * @author Mark Guinn <mark@adaircreative.com>
  * @date 08.16.2013
  * @package shop_extendedpricing
  */
-class ExtendedPricingTest extends SapphireTest
+class GroupPricingTest extends SapphireTest
 {
 	static $fixture_file = 'ExtendedPricingTest.yml';
 
@@ -60,6 +60,35 @@ class ExtendedPricingTest extends SapphireTest
 		$this->assertEquals($p2->BasePrice, $p2->sellingPrice());
 		$this->assertEquals($p3->CustomerPrice, $p3->sellingPrice());
 	}
+
+
+	function testGroupPricingOnVariations() {
+		/** @var Member $m2 */
+		$m2 = $this->objFromFixture('Member', 'm2');
+		/** @var Product $p4 */
+		$p4 = $this->objFromFixture('Product', 'p4');
+		/** @var ProductVariation $p4v1 */
+		$p4v1 = $this->objFromFixture('ProductVariation', 'p4v1');
+		$p4v2 = $this->objFromFixture('ProductVariation', 'p4v2');
+		$p4v3 = $this->objFromFixture('ProductVariation', 'p4v3');
+		$p4v4 = $this->objFromFixture('ProductVariation', 'p4v4');
+
+		// Product and variations should initially give the default prices
+		$this->assertEquals(25, $p4->sellingPrice(),    'initial selling price');
+		$this->assertEquals(20, $p4v1->sellingPrice(),  'initial selling price');
+		$this->assertEquals(22, $p4v2->sellingPrice(),  'initial selling price');
+		$this->assertEquals(25, $p4v3->sellingPrice(),  'initial selling price');
+		$this->assertEquals(25, $p4v4->sellingPrice(),  'initial selling price');
+
+		// After logging in pricing should be adjusted
+		$m2->logIn();
+		$this->assertEquals(23, $p4->sellingPrice(),    'product gives alt price');
+		$this->assertEquals(15, $p4v1->sellingPrice(),  'variation gives its own alt price');
+		$this->assertEquals(22, $p4v2->sellingPrice(),  'variation with a price but no alt price should use its price');
+		$this->assertEquals(23, $p4v3->sellingPrice(),  'variation with nothing should give products alt price');
+		$this->assertEquals(10, $p4v4->sellingPrice(),  'variation with alt price should give it, even if no price present');
+	}
+
 
 	function testCartActivity() {
 		/** @var Member $m1 */

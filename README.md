@@ -5,7 +5,6 @@ Provides several options of extended pricing for Buyables.
 
 GROUP PRICING
 -------------
-
 Allows you to define one or more additional levels of pricing
 that take effect based on the group of the logged in user. The
 primary use case is wholesale or corporate pricing.
@@ -29,10 +28,49 @@ This will create additional fields in the CMS and on the Product
 record. Product->sellingPrice() will then return the lowest
 applicable price for the current member.
 
+
+PROMOTIONAL PRICING
+-------------------
+Allows you to set promotional discounts on products, variations, and
+categories.
+
+- can be applied to categories as well
+- can be limited by start and/or end date
+- can be absolute price or percentage discount
+- can specify whether to display as a sale (i.e. show old price crossed out)
+
+To use, you must add the 'HasPromotionalPricing' extension at
+whatever levels you want like so:
+
+```
+Product:
+  extensions:
+    - HasPromotionalPricing
+ProductVariation:
+  extensions:
+    - HasPromotionalPricing
+ProductCategory:
+  extensions:
+    - HasPromotionalPricing
+```
+
+Discounts are then applied on the Pricing tab in the CMS. By default,
+discounts do not compound if they are applied at multiple levels (i.e.
+a $5 discount on the category and a $4 discount on the product would
+only yield $4 discount), but if you wish to change that you can
+use the following config setting:
+
+```
+HasPromotionalPricing:
+  compound_discounts: true
+```
+
+
 TODO
 ----
-- test group pricing on variations
-- sale pricing rules
+- Finish unit tests for promos+group price
+- Display options for promo prices
+
 
 DEVELOPERS:
 -----------
