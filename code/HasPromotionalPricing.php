@@ -30,10 +30,12 @@ class HasPromotionalPricing extends DataExtension
 		"PromoEndDate"   => "Datetime",
 	);
 
-	/**
-	 * @var bool - used by sellingPriceBeforePromotions
-	 */
+	/** @var bool - used by sellingPriceBeforePromotions */
 	protected static $bypass = false;
+
+	/** @var double - used for savings calculations */
+	protected $_cachedPrice;
+	protected $_cachedOriginal;
 
 	/**
 	 * Extracts out the field updating since that could happen at a couple
@@ -41,7 +43,9 @@ class HasPromotionalPricing extends DataExtension
 	 * @param FieldList $fields
 	 */
 	protected function updateFields(FieldList $fields) {
-		Requirements::javascript(SHOP_EXTENDEDPRICING_FOLDER . '/javascript/ExtendedPricingAdmin.js');
+		// This seemed to cause problems. Moved to config.yml.
+		//Requirements::javascript(SHOP_EXTENDEDPRICING_FOLDER . '/javascript/ExtendedPricingAdmin.js');
+
 		$newFields = array(
 			new CheckboxField("PromoActive", "Promotional pricing active?"),
 			new OptionsetField("PromoDisplay", "Display Settings",
@@ -109,11 +113,35 @@ class HasPromotionalPricing extends DataExtension
 	 *
 	 * @return double
 	 */
-	public function sellingPriceBeforePromotions() {
+	public function sellingPriceBeforePromotion() {
 		self::$bypass = true;
 		$price = $this->getOwner()->sellingPrice();
 		self::$bypass = false;
 		return $price;
+	}
+
+	/**
+	 * Original price for template usage
+	 * @return Money
+	 */
+	function OriginalPrice() {
+		$currency = Payment::site_currency();
+		$field = new Money("OriginalPrice");
+		$field->setAmount($this->sellingPriceBeforePromotion());
+		$field->setCurrency($currency);
+		return $field;
+	}
+
+	/**
+	 * TODO: make sure these calculations only happen once
+	 * @return Money
+	 */
+	function PromoSavings() {
+		$currency = Payment::site_currency();
+		$field = new Money("PromoSavings");
+		$field->setAmount($this->sellingPriceBeforePromotion() - $this->getOwner()->sellingPrice());
+		$field->setCurrency($currency);
+		return $field;
 	}
 
 	/**
@@ -130,7 +158,7 @@ class HasPromotionalPricing extends DataExtension
 		{
 			$p = $this->getOwner()->Product();
 			if ($p && $p->exists() && $p->hasExtension('HasPromotionalPricing') && $p->hasValidPromotion()) {
-				$price = $p->sellingPriceBeforePromotions();
+				$price = $p->sellingPriceBeforePromotion();
 			}
 		}
 
@@ -241,5 +269,13 @@ class HasPromotionalPricing extends DataExtension
 
 		// All clear
 		return true;
+	}
+
+	/**
+	 * For template
+	 * @return bool
+	 */
+	public function HasPromotion() {
+		return $this->hasValidPromotion();
 	}
 }

@@ -65,11 +65,14 @@ HasPromotionalPricing:
   compound_discounts: true
 ```
 
+See the examples in templates/Includes for display. You'll probably
+need to modify your template.
+
 
 TODO
 ----
-- Finish unit tests for promos+group price
-- Display options for promo prices
+- Add display templates for cart and checkout
+- Debug flaky javascript in CMS
 
 
 DEVELOPERS:

@@ -8,9 +8,7 @@
  */
 (function ($, window, document, undefined) {
 	'use strict';
-
 	function updatePromoFields(){
-		console.log('updatefields');
 		$('#PromoPercent').toggle($('#Form_EditForm_PromoType_Percent')[0].checked);
 		$('#PromoAmount').toggle($('#Form_EditForm_PromoType_Amount')[0].checked);
 	}

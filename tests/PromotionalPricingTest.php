@@ -166,6 +166,19 @@ class PromotionalPricingTest extends SapphireTest
 	}
 
 	function testPromoWithGroupPricing() {
+		/** @var Product $p1 */
+		$p1 = $this->objFromFixture('Product', 'p1');
+		/** @var Member $m1 */
+		$m1 = $this->objFromFixture('Member', 'm1');
 
+		$this->assertEquals(27.50, $p1->sellingPrice(), 'Check initial price');
+
+		$m1->logIn();
+		$this->assertEquals(25, $p1->sellingPrice(), 'Check group price');
+
+		$p1->PromoActive    = true;
+		$p1->PromoType      = 'Amount';
+		$p1->PromoAmount    = 10;
+		$this->assertEquals(15, $p1->sellingPrice(), 'Check group + promo');
 	}
 }
