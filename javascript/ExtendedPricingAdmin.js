@@ -8,13 +8,16 @@
  */
 (function ($, window, document, undefined) {
 	'use strict';
+
 	function updatePromoFields(){
 		$('#PromoPercent').toggle($('#Form_EditForm_PromoType_Percent')[0].checked);
 		$('#PromoAmount').toggle($('#Form_EditForm_PromoType_Amount')[0].checked);
 	}
 
 	$(function(){
-		updatePromoFields();
-		$('#PromoType input').click(updatePromoFields);
+		if ($('#PromoType input').length > 0) {
+			updatePromoFields();
+			$('#PromoType input').click(updatePromoFields);
+		}
 	});
 }(jQuery, this, this.document));
