@@ -124,22 +124,31 @@ class HasPromotionalPricing extends DataExtension
 	 * Original price for template usage
 	 * @return Money
 	 */
-	function OriginalPrice() {
+	function getOriginalPrice() {
 		$currency = Payment::site_currency();
 		$field = new Money("OriginalPrice");
 		$field->setAmount($this->sellingPriceBeforePromotion());
 		$field->setCurrency($currency);
 		return $field;
 	}
+	function OriginalPrice(){ return $this->getOriginalPrice(); }
+
 
 	/**
 	 * TODO: make sure these calculations only happen once
+	 * @return float
+	 */
+	function calculatePromoSavings() {
+		return $this->sellingPriceBeforePromotion() - $this->getOwner()->sellingPrice();
+	}
+
+	/**
 	 * @return Money
 	 */
 	function PromoSavings() {
 		$currency = Payment::site_currency();
 		$field = new Money("PromoSavings");
-		$field->setAmount($this->sellingPriceBeforePromotion() - $this->getOwner()->sellingPrice());
+		$field->setAmount($this->calculatePromoSavings());
 		$field->setCurrency($currency);
 		return $field;
 	}
