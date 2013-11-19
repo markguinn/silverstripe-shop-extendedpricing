@@ -125,7 +125,10 @@ class HasPromotionalPricing extends DataExtension
 	 * @return Money
 	 */
 	function getOriginalPrice() {
-		$currency = Payment::site_currency();
+		$currency = method_exists('ShopConfig', 'get_site_currency')
+			? ShopConfig::get_site_currency()
+			: Payment::site_currency();
+
 		$field = new Money("OriginalPrice");
 		$field->setAmount($this->sellingPriceBeforePromotion());
 		$field->setCurrency($currency);
@@ -146,7 +149,10 @@ class HasPromotionalPricing extends DataExtension
 	 * @return Money
 	 */
 	function PromoSavings() {
-		$currency = Payment::site_currency();
+		$currency = method_exists('ShopConfig', 'get_site_currency')
+			? ShopConfig::get_site_currency()
+			: Payment::site_currency();
+
 		$field = new Money("PromoSavings");
 		$field->setAmount($this->calculatePromoSavings());
 		$field->setCurrency($currency);
