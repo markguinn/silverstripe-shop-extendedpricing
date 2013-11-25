@@ -264,11 +264,36 @@ class HasPromotionalPricing extends DataExtension
 
 	/**
 	 * Does this object have an applicable promo?
-	 * @param ProductCategory|Buyable $obj [optional]
+	 * @param Buyable $obj [optional]
+	 * @param bool    $recursive [optional] - include parent objects in the answer? Default false.
 	 * @return bool
 	 */
-	public function hasValidPromotion($obj=null) {
+	public function hasValidPromotion($obj=null, $recursive=false) {
 		if (!$obj) $obj = $this->getOwner();
+
+		// Handle recursive functionality
+		if ($recursive) {
+			// first check ourselves
+			if ($this->hasValidPromotion($obj, false)) return true;
+
+			// then check all our various parents
+			$parents = $this->collectParentPromoSources();
+			if (is_array($parents) && count($parents) > 0) {
+				$processed = array();
+				foreach ($parents as $parent) {
+					// It's very possible to have a category in there
+					// more than once, so just do a quick uniqueness check
+					$key = $parent->ClassName . ':' . $parent->ID;
+					if (isset($processed[$key])) continue;
+					$processed[$key] = true;
+
+					// Apply the promo and stop if needed
+					if ($this->hasValidPromotion($parent, false)) return true;
+				}
+			}
+
+			return false;
+		}
 
 		// Check that it's not disabled
 		if (!$obj->PromoActive) return false;
@@ -287,10 +312,12 @@ class HasPromotionalPricing extends DataExtension
 	}
 
 	/**
-	 * For template
+	 * For template so logic is slightly different and more compressed.
 	 * @return bool
 	 */
 	public function HasPromotion() {
-		return $this->hasValidPromotion();
+		if (!$this->hasValidPromotion($this->owner, true)) return false;
+		if ($this->calculatePromoSavings() == 0) return false;
+		return true;
 	}
 }
