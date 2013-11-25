@@ -51,12 +51,15 @@ class HasGroupPricing extends DataExtension
 	 * @param FieldList $fields
 	 */
 	protected function updateFields(FieldList $fields) {
+		// pricing is handled on the variations instead if they are present
+		if ($this->getOwner() instanceof Product && $this->getOwner()->Variations()->exists()) return;
+
 		foreach (self::get_levels() as $code => $fieldName) {
 			$newField = new TextField($fieldName, $this->getOwner()->fieldLabel($fieldName), '', 12);
 			if ($fields->hasTabSet()) {
 				$fields->addFieldToTab('Root.Pricing', $newField);
 			} else {
-				$fields->push($newField);
+				$fields->insertAfter($newField, 'Price');
 			}
 		}
 	}
