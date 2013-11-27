@@ -92,24 +92,29 @@ class HasGroupPricing extends DataExtension
 	}
 
 	/**
-	 * TODO: this probably needs to be cached
 	 * @param $price
 	 */
 	public function updateSellingPrice(&$price) {
-		$levels = self::get_levels();
-		$member = Member::currentUser();
-		if (count($levels) > 0 && $member) {
-			// if there is a logged in member and multiple levels, check them uot
-			$groups = $member->Groups()->column('Code');
-			foreach ($groups as $code) {
-				// if the group we're looking at has it's own price field,
-				// and the price is lower than the current price, update it
-				if (isset($levels[$code])) {
-					$field = $levels[$code];
-					$altPrice = $this->getOwner()->getField($field);
-					if ($altPrice > 0 && $altPrice < $price) $price = $altPrice;
+		if (!PriceCache::inst()->fetch($this->owner, 'Group', $price)) {
+			$levels = self::get_levels();
+			$member = Member::currentUser();
+
+			if (count($levels) > 0 && $member) {
+				// if there is a logged in member and multiple levels, check them uot
+				$groups = $member->Groups()->column('Code');
+				foreach ($groups as $code) {
+					// if the group we're looking at has it's own price field,
+					// and the price is lower than the current price, update it
+					if (isset($levels[$code])) {
+						$field = $levels[$code];
+						$altPrice = $this->getOwner()->getField($field);
+						if ($altPrice > 0 && $altPrice < $price) $price = $altPrice;
+					}
 				}
 			}
+
+			PriceCache::inst()->set($this->owner, 'Group', $price);
 		}
 	}
+
 }

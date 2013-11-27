@@ -114,10 +114,13 @@ class HasPromotionalPricing extends DataExtension
 	 * @return double
 	 */
 	public function sellingPriceBeforePromotion() {
+		$cached = PriceCache::inst()->get($this->owner, 'PromoOriginal');
+		if ($cached !== false) return $cached;
+
 		self::$bypass = true;
 		$price = $this->getOwner()->sellingPrice();
 		self::$bypass = false;
-		return $price;
+		return PriceCache::inst()->set($this->owner, 'PromoOriginal', $price);
 	}
 
 	/**
@@ -138,7 +141,6 @@ class HasPromotionalPricing extends DataExtension
 
 
 	/**
-	 * TODO: make sure these calculations only happen once
 	 * @return float
 	 */
 	function calculatePromoSavings() {
@@ -160,11 +162,13 @@ class HasPromotionalPricing extends DataExtension
 	}
 
 	/**
-	 * TODO: check category discounts
 	 * @param $price
 	 */
 	public function updateSellingPrice(&$price) {
 		if (self::$bypass || Config::inst()->get('HasPromotionalPricing', 'disable_discounts')) return;
+
+		// try to serve from the cache
+		if (PriceCache::inst()->fetch($this->owner, 'Promo', $price)) return;
 
 		// Special case: if this is a variation without it's own price
 		// AND the parent product has a promo, the price we inherited
@@ -180,7 +184,10 @@ class HasPromotionalPricing extends DataExtension
 		// Apply the most local discount first
 		$compoundDiscounts = Config::inst()->get('HasPromotionalPricing', 'compound_discounts');
 		$applied = $this->applyPromoFrom($this->getOwner(), $price);
-		if ($applied && !$compoundDiscounts) return;
+		if ($applied && !$compoundDiscounts) {
+			PriceCache::inst()->set($this->owner, 'Promo', $price);
+			return;
+		}
 
 		// For each level of parent discounts do the same
 		$parents = $this->collectParentPromoSources();
@@ -195,21 +202,38 @@ class HasPromotionalPricing extends DataExtension
 
 				// Apply the promo and stop if needed
 				$applied = $this->applyPromoFrom($parent, $price);
-				if ($applied && !$compoundDiscounts) return;
+				if ($applied && !$compoundDiscounts) {
+					PriceCache::inst()->set($this->owner, 'Promo', $price);
+					return;
+				}
 			}
 		}
+
+		PriceCache::inst()->set($this->owner, 'Promo', $price);
 	}
 
 	/**
 	 * Collects any other sources of applicable discounts, leaving
-	 * room for extension from other sources
+	 * room for extension from other sources.
+	 *
+	 * NOTE: This method can be called from HasPromotion or sellingPrice
+	 * so we use the price cache. IF the price cache ever became persistent
+	 * we would want to stop using it in that way because it would probably
+	 * be slower to serialize all those objects than would be worth it.
+	 *
 	 * @param $obj [optional]
 	 * @return array
 	 */
 	protected function collectParentPromoSources($obj = null) {
 		if (!$obj) $obj = $this->getOwner();
+
+		// try the cache
+		$sources = PriceCache::inst()->get($obj, 'PromoSources');
+		if ($sources !== false) return $sources;
+
+		// if not found look everything up
 		if ($obj->hasMethod('getParentPromoSources')) {
-			return $obj->getParentPromoSources();
+			return PriceCache::inst()->set($obj, 'PromoSources', $obj->getParentPromoSources());
 		} else {
 			$sources = array();
 
@@ -236,7 +260,7 @@ class HasPromotionalPricing extends DataExtension
 				}
 			}
 
-			return $sources;
+			return PriceCache::inst()->set($obj, 'PromoSources', $sources);
 		}
 	}
 

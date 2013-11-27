@@ -27,55 +27,67 @@ class PromotionalPricingTest extends SapphireTest
 	function testPromoPricing() {
 		/** @var Product $p1 */
 		$p1 = $this->objFromFixture('Product', 'p1');
+		PriceCache::inst()->clear();
 
 		// When there is no promo price, should return the base price
 		$this->assertEquals(27.50, $p1->sellingPrice(), 'When there is no promo price, should return the base price');
 
 		// When we add a promo price, should return it
+		PriceCache::inst()->clear();
 		$p1->PromoActive    = true;
 		$p1->PromoType      = 'Amount';
 		$p1->PromoAmount    = 10;
 		$this->assertEquals(17.50, $p1->sellingPrice(), 'When we add a promo price, should return it');
 
 		// When promo is not active, should get the base price
+		PriceCache::inst()->clear();
 		$p1->PromoActive    = false;
 		$this->assertEquals(27.50, $p1->sellingPrice(), 'When promo is not active, should get the base price');
 
 		// Test the start and end dates
+		PriceCache::inst()->clear();
 		$p1->PromoActive    = true;
 		$p1->PromoStartDate = date('Y-m-d H:i:s', strtotime('tomorrow'));
 		$p1->PromoEndDate   = null;
 		$this->assertEquals(27.50, $p1->sellingPrice(), 'Start date in the future and no end date');
 
+		PriceCache::inst()->clear();
 		$p1->PromoStartDate = date('Y-m-d H:i:s', strtotime('yesterday'));
 		$p1->PromoEndDate   = null;
 		$this->assertEquals(17.50, $p1->sellingPrice(), 'Start date in the past and no end date');
 
+		PriceCache::inst()->clear();
 		$p1->PromoStartDate = date('Y-m-d H:i:s', strtotime('yesterday'));
 		$p1->PromoEndDate   = date('Y-m-d H:i:s', strtotime('tomorrow'));
 		$this->assertEquals(17.50, $p1->sellingPrice(), 'Start date in the past, End date in the future (in the window)');
 
+		PriceCache::inst()->clear();
 		$p1->PromoStartDate = date('Y-m-d H:i:s', strtotime('tomorrow'));
 		$p1->PromoEndDate   = date('Y-m-d H:i:s', strtotime('+2 days'));
 		$this->assertEquals(27.50, $p1->sellingPrice(), 'Start date and end date in the future');
 
+		PriceCache::inst()->clear();
 		$p1->PromoStartDate = date('Y-m-d H:i:s', strtotime('-2 days'));
 		$p1->PromoEndDate   = date('Y-m-d H:i:s', strtotime('yesterday'));
 		$this->assertEquals(27.50, $p1->sellingPrice(), 'Start and end date in the past');
 
+		PriceCache::inst()->clear();
 		$p1->PromoStartDate = date('Y-m-d H:i:s', strtotime('tomorrow'));
 		$p1->PromoEndDate   = date('Y-m-d H:i:s', strtotime('yesterday'));
 		$this->assertEquals(27.50, $p1->sellingPrice(), 'Start date in the future, End date in the past (i.e. all messed up)');
 
+		PriceCache::inst()->clear();
 		$p1->PromoStartDate = null;
 		$p1->PromoEndDate   = date('Y-m-d H:i:s', strtotime('tomorrow'));
 		$this->assertEquals(17.50, $p1->sellingPrice(), 'End date in the future and no start date');
 
+		PriceCache::inst()->clear();
 		$p1->PromoStartDate = null;
 		$p1->PromoEndDate   = date('Y-m-d H:i:s', strtotime('yesterday'));
 		$this->assertEquals(27.50, $p1->sellingPrice(), 'End date in the past and no start date');
 
 		// Test percentage
+		PriceCache::inst()->clear();
 		$p1->PromoEndDate   = null;
 		$p1->PromoType      = 'Percent';
 		$p1->PromoPercent   = 0.10;
@@ -89,12 +101,14 @@ class PromotionalPricingTest extends SapphireTest
 		$p4v1 = $this->objFromFixture('ProductVariation', 'p4v1');
 		/** @var ProductVaration $p4v3 */
 		$p4v3 = $this->objFromFixture('ProductVariation', 'p4v3'); // this one doesn't have it's own price
+		PriceCache::inst()->clear();
 
 		// When there is no promo price, should return the base price
 		$this->assertEquals(20, $p4v1->sellingPrice(), 'When there is no promo, should return the base price');
 		$this->assertEquals(25, $p4v3->sellingPrice(), 'When there is no promo, should return the base price even if no price on variation');
 
 		// When we add a promo price to the PRODUCT, it should apply to the variations as well
+		PriceCache::inst()->clear();
 		$p4->PromoActive    = true;
 		$p4->PromoType      = 'Amount';
 		$p4->PromoAmount    = 10;
@@ -107,6 +121,7 @@ class PromotionalPricingTest extends SapphireTest
 		$this->assertEquals(15, $p4v3->sellingPrice(), 'When we add a promo to the product, should return it for variations without a price');
 
 		// When we add a promo to the variation, and compound_discounts is disabled, it should OVERRIDE any promos on the product
+		PriceCache::inst()->clear();
 		$p4v1->PromoActive  = true;
 		$p4v1->PromoType    = 'Amount';
 		$p4v1->PromoAmount  = 1;
@@ -118,11 +133,13 @@ class PromotionalPricingTest extends SapphireTest
 		$this->assertEquals(24, $p4v3->sellingPrice(), 'When we add a promo to the variation, and compound_discounts is disabled, it should OVERRIDE any promos on the product even if the variation has no price');
 
 		// When we add a promo to the variation, and compound_discounts is enabled, it should APPLY BOTH promos
+		PriceCache::inst()->clear();
 		Config::inst()->update('HasPromotionalPricing', 'compound_discounts', true);
 		$this->assertEquals(9, $p4v1->sellingPrice(), 'When we add a promo to the variation, and compound_discounts is disabled, it should APPLY BOTH promos');
 		$this->assertEquals(14, $p4v3->sellingPrice(), 'When we add a promo to the variation, and compound_discounts is disabled, it should APPLY BOTH promos even if the variation has no price');
 
 		// When a promo is only on the variation it should apply properly
+		PriceCache::inst()->clear();
 		$p4->PromoActive    = false;
 		$p4->write();
 		DataObject::reset();
@@ -141,6 +158,7 @@ class PromotionalPricingTest extends SapphireTest
 		$c1 = $this->objFromFixture('ProductCategory', 'c1');
 		/** @var ProductVaration $p4v1 */
 		$p4v1 = $this->objFromFixture('ProductVariation', 'p4v1');
+		PriceCache::inst()->clear();
 
 		// Products are initially right
 		$this->assertEquals(27.50,  $p1->sellingPrice(),    'Products are initially right');
@@ -148,6 +166,7 @@ class PromotionalPricingTest extends SapphireTest
 		$this->assertEquals(20,     $p4v1->sellingPrice(),  'Products are initially right');
 
 		// When a promo is added to the parent category, it changes the price on products
+		PriceCache::inst()->clear();
 		$c1->PromoActive    = true;
 		$c1->PromoType      = 'Amount';
 		$c1->PromoAmount    = 10;
@@ -170,15 +189,18 @@ class PromotionalPricingTest extends SapphireTest
 		$p1 = $this->objFromFixture('Product', 'p1');
 		/** @var Member $m1 */
 		$m1 = $this->objFromFixture('Member', 'm1');
+		PriceCache::inst()->clear();
 
 		$this->assertEquals(27.50, $p1->sellingPrice(), 'Check initial price');
 
 		$m1->logIn();
+		PriceCache::inst()->clear();
 		$this->assertEquals(25, $p1->sellingPrice(), 'Check group price');
 
 		$p1->PromoActive    = true;
 		$p1->PromoType      = 'Amount';
 		$p1->PromoAmount    = 10;
+		PriceCache::inst()->clear();
 		$this->assertEquals(15, $p1->sellingPrice(), 'Check group + promo');
 	}
 }
