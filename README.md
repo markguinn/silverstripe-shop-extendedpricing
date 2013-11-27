@@ -1,6 +1,8 @@
 Extended Pricing Options for Silverstripe Shop
 ==============================================
 
+[![Build Status](https://secure.travis-ci.org/markguinn/silverstripe-shop-extendedpricing.png)](http://travis-ci.org/markguinn/silverstripe-shop-extendedpricing)
+
 Provides several options of extended pricing for Buyables.
 
 GROUP PRICING

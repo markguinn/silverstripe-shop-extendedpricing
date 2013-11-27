@@ -14,7 +14,7 @@ class PriceCache
 	/** @var bool */
 	protected $disabled = false;
 
-	
+
 	/**
 	 * @return PriceCache
 	 */
