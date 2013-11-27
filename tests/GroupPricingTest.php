@@ -22,6 +22,11 @@ class GroupPricingTest extends SapphireTest
 			Product::add_extension('HasGroupPricing');
 		}
 
+		$pv = singleton('ProductVariation');
+		if (!$pv->hasExtension('HasGroupPricing')) {
+			ProductVariation::add_extension('HasGroupPricing');
+		}
+
 		PriceCache::inst()->disable();
 	}
 
@@ -51,13 +56,11 @@ class GroupPricingTest extends SapphireTest
 
 		// When logged in, selling price should change.
 		$m1->logIn();
-		PriceCache::inst()->clear();
 		$this->assertEquals($p1->CustomerPrice, $p1->sellingPrice());
 
 		// When a user is in more than one group, it should reflect the lowest price.
 		$m1->logOut();
 		$m2->logIn();
-		PriceCache::inst()->clear();
 		$this->assertEquals($p1->WholesalePrice, $p1->sellingPrice());
 
 		// If group price is not specified, base price should be assumed.
@@ -86,7 +89,6 @@ class GroupPricingTest extends SapphireTest
 
 		// After logging in pricing should be adjusted
 		$m2->logIn();
-		PriceCache::inst()->clear();
 		$this->assertEquals(23, $p4->sellingPrice(),    'product gives alt price');
 		$this->assertEquals(15, $p4v1->sellingPrice(),  'variation gives its own alt price');
 		$this->assertEquals(22, $p4v2->sellingPrice(),  'variation with a price but no alt price should use its price');
@@ -108,7 +110,6 @@ class GroupPricingTest extends SapphireTest
 		$order = ShoppingCart::curr();
 		$this->assertEquals($p1->BasePrice, $order->SubTotal());
 		$m1->logIn();
-		PriceCache::inst()->clear();
 		$this->assertEquals($p1->CustomerPrice, $order->SubTotal());
 
 		// TODO: We should also test that the total gets updated at the proper time
