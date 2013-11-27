@@ -21,6 +21,8 @@ class GroupPricingTest extends SapphireTest
 		if (!$p->hasExtension('HasGroupPricing')) {
 			Product::add_extension('HasGroupPricing');
 		}
+
+		PriceCache::inst()->disable();
 	}
 
 	function testGroupPricing() {

@@ -22,6 +22,8 @@ class PromotionalPricingTest extends SapphireTest
 			Product::add_extension('HasGroupPricing');
 			Product::add_extension('HasPromotionalPricing');
 		}
+
+		PriceCache::inst()->disable();
 	}
 
 	function testPromoPricing() {
