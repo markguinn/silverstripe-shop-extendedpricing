@@ -27,8 +27,14 @@ class GroupPricingTest extends SapphireTest
 			ProductVariation::add_extension('HasGroupPricing');
 		}
 
+		parent::setUpOnce();
+	}
+
+	function setUp() {
+		parent::setUp();
 		PriceCache::inst()->disable();
 	}
+
 
 	function testGroupPricing() {
 		/** @var Member $m1 */

@@ -173,8 +173,7 @@ class HasPromotionalPricing extends DataExtension
 		// Special case: if this is a variation without it's own price
 		// AND the parent product has a promo, the price we inherited
 		// is already discounted, so we need to reset that.
-		if ($this->getOwner() instanceof ProductVariation && !$this->getOwner()->Price)
-		{
+		if ($this->getOwner() instanceof ProductVariation && !(float)$this->getOwner()->Price) {
 			$p = $this->getOwner()->Product();
 			if ($p && $p->exists() && $p->hasExtension('HasPromotionalPricing') && $p->hasValidPromotion()) {
 				$price = $p->sellingPriceBeforePromotion();

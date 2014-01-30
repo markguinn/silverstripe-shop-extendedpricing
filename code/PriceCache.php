@@ -46,7 +46,7 @@ class PriceCache
 	 */
 	public function get($buyable, $type) {
 		$key = $this->keyFor($buyable, $type);
-		if (!$this->disabled && isset($this->cache[$key])) {
+		if ($key && !$this->disabled && isset($this->cache[$key])) {
 			return $this->cache[$key];
 		} else {
 			return false;
@@ -62,7 +62,7 @@ class PriceCache
 	 */
 	public function fetch($buyable, $type, &$data) {
 		$key = $this->keyFor($buyable, $type);
-		if (!$this->disabled && isset($this->cache[$key])) {
+		if ($key && !$this->disabled && isset($this->cache[$key])) {
 			$data = $this->cache[$key];
 			return true;
 		} else {
@@ -80,6 +80,7 @@ class PriceCache
 	public function set($buyable, $type, $data) {
 		if ($this->disabled) return $data;
 		$key = $this->keyFor($buyable, $type);
+		if (!$key) return $data;
 		$this->cache[$key] = $data;
 		return $data;
 	}
@@ -99,7 +100,9 @@ class PriceCache
 	 * @return string
 	 */
 	protected function keyFor($buyable, $type='') {
-		return $buyable->ClassName . $buyable->ID . $type;
+		return $buyable->ID
+			? $buyable->ClassName . $buyable->ID . $type
+			: null; //serialize($buyable->toMap()) . $type;
 	}
 
 }

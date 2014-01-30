@@ -13,7 +13,7 @@
 		"installer-name": "shop_extendedpricing"
 	},
 	"require": {
-		"silverstripe/framework": "~3.1",
-		"burnbright/silverstripe-shop": "*"
+		"silverstripe/framework": ">=3.1",
+		"burnbright/silverstripe-shop": "1.*"
 	}
 }
