@@ -111,16 +111,24 @@ class HasPromotionalPricing extends DataExtension
 	 * gaurantee that any extensions before or after this one
 	 * get to run.
 	 *
+	 * NOTE: this seems to have stopped working under certain
+	 * circumstances so I'm just falling back on BasePrice for
+	 * now. If you need this feature send me a note or a PR.
+	 *
 	 * @return double
 	 */
 	public function sellingPriceBeforePromotion() {
-		$cached = PriceCache::inst()->get($this->owner, 'PromoOriginal');
-		if ($cached !== false) return $cached;
+		$p = $this->getOwner();
+		return $p->hasField('BasePrice') ? $p->BasePrice : $p->Price;
 
-		self::$bypass = true;
-		$price = $this->getOwner()->sellingPrice();
-		self::$bypass = false;
-		return PriceCache::inst()->set($this->owner, 'PromoOriginal', $price);
+//		$cached = PriceCache::inst()->get($this->owner, 'PromoOriginal');
+//		if ($cached !== false) return $cached;
+//
+//		self::$bypass = true;
+//		$price = $this->getOwner()->sellingPrice();
+//		self::$bypass = false;
+//
+//		return PriceCache::inst()->set($this->owner, 'PromoOriginal', $price);
 	}
 
 	/**
@@ -144,7 +152,9 @@ class HasPromotionalPricing extends DataExtension
 	 * @return float
 	 */
 	function calculatePromoSavings() {
-		return $this->sellingPriceBeforePromotion() - $this->getOwner()->sellingPrice();
+		$list = $this->sellingPriceBeforePromotion();
+		$cur  = $this->getOwner()->sellingPrice();
+		return $list - $cur;
 	}
 
 	/**
