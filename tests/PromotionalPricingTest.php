@@ -94,6 +94,10 @@ class PromotionalPricingTest extends SapphireTest
 		$p1->PromoType      = 'Percent';
 		$p1->PromoPercent   = 0.10;
 		$this->assertEquals(24.75, $p1->sellingPrice(), 'Percentage discount');
+
+		// Test additional methods
+		$this->assertTrue($p1->HasPromotion());
+		$this->assertEquals(27.50 - 24.75, $p1->calculatePromoSavings());
 	}
 
 	function testPromoOnVariation() {
