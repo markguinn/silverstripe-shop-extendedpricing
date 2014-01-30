@@ -18,17 +18,12 @@ class PromotionalPricingTest extends SapphireTest
 		));
 
 		$p = singleton('Product');
-		// the order matters so need to remove and re-add the extensions
-		if ($p->hasExtension('HasGroupPricing')) Product::remove_extension('HasGroupPricing');
-		if ($p->hasExtension('HasPromotionalPricing')) Product::remove_extension('HasPromotionalPricing');
-		Product::add_extension('HasGroupPricing');
-		Product::add_extension('HasPromotionalPricing');
+		if (!$p->hasExtension('HasGroupPricing')) Product::add_extension('HasGroupPricing');
+		if (!$p->hasExtension('HasPromotionalPricing')) Product::add_extension('HasPromotionalPricing');
 
 		$pv = singleton('ProductVariation');
-		if ($pv->hasExtension('HasGroupPricing')) ProductVariation::remove_extension('HasGroupPricing');
-		if ($pv->hasExtension('HasPromotionalPricing')) ProductVariation::remove_extension('HasPromotionalPricing');
-		ProductVariation::add_extension('HasGroupPricing');
-		ProductVariation::add_extension('HasPromotionalPricing');
+		if (!$pv->hasExtension('HasGroupPricing')) ProductVariation::add_extension('HasGroupPricing');
+		if (!$pv->hasExtension('HasPromotionalPricing')) ProductVariation::add_extension('HasPromotionalPricing');
 
 		parent::setUpOnce();
 	}
