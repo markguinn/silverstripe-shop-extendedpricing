@@ -57,7 +57,7 @@ class HasGroupPricing extends DataExtension
 		foreach (self::get_levels() as $code => $fieldName) {
 			$newField = new TextField($fieldName, $this->getOwner()->fieldLabel($fieldName), '', 12);
 			if ($fields->hasTabSet()) {
-				$fields->addFieldToTab('Root.Pricing', $newField);
+				$fields->addFieldToTab('Root.Pricing', $newField, 'CostPrice');
 			} else {
 				$fields->insertAfter($newField, 'Price');
 			}
