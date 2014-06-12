@@ -5,9 +5,9 @@
  * @author Mark Guinn <mark@adaircreative.com>
  * @date 08.20.2013
  * @package shop_extendedpricing
- * @subpackage forms
+ * @subpackage tests
  */
-class PercentageFieldTest extends SapphireTest
+class PercentageFieldTest extends ExtendedPricingBaseTest
 {
 	function testField() {
 		// Should start at 0
