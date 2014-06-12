@@ -17,6 +17,9 @@ class PromotionalPricingTest extends SapphireTest
 			'wholesale' => 'WholesalePrice',
 		));
 
+		$pc = singleton('ProductCategory');
+		if (!$pc->hasExtension('HasPromotionalPricing')) ProductCategory::add_extension('HasPromotionalPricing');
+
 		$p = singleton('Product');
 		if (!$p->hasExtension('HasGroupPricing')) Product::add_extension('HasGroupPricing');
 		if (!$p->hasExtension('HasPromotionalPricing')) Product::add_extension('HasPromotionalPricing');
@@ -164,6 +167,7 @@ class PromotionalPricingTest extends SapphireTest
 		$c1->PromoAmount    = 10;
 		$c1->write();
 		DataObject::flush_and_destroy_cache();
+		$p1 = Product::get()->byID($p1->ID);
 		$this->assertEquals(17.50,  $p1->sellingPrice(),    'When a promo is added to the parent category, it changes the price on products');
 
 		// Check that it also works if the category is not the main parent category

@@ -17,15 +17,17 @@ class GroupPricingTest extends SapphireTest
 			'wholesale' => 'WholesalePrice',
 		));
 
+		// i'm adding them all here because if you run all the tests together, the db doesn't seem to get rebuilt
+		$pc = singleton('ProductCategory');
+		if (!$pc->hasExtension('HasPromotionalPricing')) ProductCategory::add_extension('HasPromotionalPricing');
+
 		$p = singleton('Product');
-		if (!$p->hasExtension('HasGroupPricing')) {
-			Product::add_extension('HasGroupPricing');
-		}
+		if (!$p->hasExtension('HasGroupPricing')) Product::add_extension('HasGroupPricing');
+		if (!$p->hasExtension('HasPromotionalPricing')) Product::add_extension('HasPromotionalPricing');
 
 		$pv = singleton('ProductVariation');
-		if (!$pv->hasExtension('HasGroupPricing')) {
-			ProductVariation::add_extension('HasGroupPricing');
-		}
+		if (!$pv->hasExtension('HasGroupPricing')) ProductVariation::add_extension('HasGroupPricing');
+		if (!$pv->hasExtension('HasPromotionalPricing')) ProductVariation::add_extension('HasPromotionalPricing');
 
 		parent::setUpOnce();
 	}
