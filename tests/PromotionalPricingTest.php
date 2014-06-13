@@ -7,9 +7,30 @@
  * @package shop_extendedpricing
  * @subpackage tests
  */
-class PromotionalPricingTest extends ExtendedPricingBaseTest
+class PromotionalPricingTest extends SapphireTest
 {
 	static $fixture_file = 'ExtendedPricingTest.yml';
+
+	protected $requiredExtensions = array(
+		'ProductCategory'  => array('HasPromotionalPricing'),
+		'Product'          => array('HasGroupPricing', 'HasPromotionalPricing'),
+		'ProductVariation' => array('HasGroupPricing', 'HasPromotionalPricing'),
+	);
+
+	function setUpOnce() {
+		Config::inst()->remove('HasGroupPricing', 'price_levels');
+		Config::inst()->update('HasGroupPricing', 'price_levels', array(
+			'customers'  => 'CustomerPrice',
+			'wholesale' => 'WholesalePrice',
+		));
+
+		parent::setUpOnce();
+	}
+
+	function setUp() {
+		parent::setUp();
+		PriceCache::inst()->disable();
+	}
 
 	function testPromoPricing() {
 		/** @var Product $p1 */

@@ -94,3 +94,14 @@ ProductVariation:
     Product: =>Product.p4
     WholesalePrice: 10
     AttributeValues: =>ProductAttributeValue.a1v2, =>ProductAttributeValue.a2v2
+
+PriceTier:
+  p2tier1:
+    Product: =>Product.p2
+    Label: 5-9 (indeed)
+    Price: 12
+    MinQty: 5
+  p2tier2:
+    Product: =>Product.p2
+    Percentage: 0.5
+    MinQty: 10

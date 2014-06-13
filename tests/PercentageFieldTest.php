@@ -7,7 +7,7 @@
  * @package shop_extendedpricing
  * @subpackage tests
  */
-class PercentageFieldTest extends ExtendedPricingBaseTest
+class PercentageFieldTest extends SapphireTest
 {
 	function testField() {
 		// Should start at 0

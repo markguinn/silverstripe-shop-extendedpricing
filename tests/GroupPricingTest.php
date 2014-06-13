@@ -6,9 +6,29 @@
  * @date 08.16.2013
  * @package shop_extendedpricing
  */
-class GroupPricingTest extends ExtendedPricingBaseTest
+class GroupPricingTest extends SapphireTest
 {
 	static $fixture_file = 'ExtendedPricingTest.yml';
+
+	protected $requiredExtensions = array(
+		'Product'          => array('HasGroupPricing'),
+		'ProductVariation' => array('HasGroupPricing'),
+	);
+
+	function setUpOnce() {
+		Config::inst()->remove('HasGroupPricing', 'price_levels');
+		Config::inst()->update('HasGroupPricing', 'price_levels', array(
+			'customers'  => 'CustomerPrice',
+			'wholesale' => 'WholesalePrice',
+		));
+
+		parent::setUpOnce();
+	}
+
+	function setUp() {
+		parent::setUp();
+		PriceCache::inst()->disable();
+	}
 
 	function testGroupPricing() {
 		/** @var Member $m1 */
