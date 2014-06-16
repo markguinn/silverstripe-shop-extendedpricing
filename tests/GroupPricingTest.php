@@ -111,10 +111,6 @@ class GroupPricingTest extends SapphireTest
 		$this->assertEquals($p1->BasePrice, $order->SubTotal());
 		$m1->logIn();
 		$this->assertEquals($p1->CustomerPrice, $order->SubTotal());
-
-		// TODO: We should also test that the total gets updated at the proper time
-		// but I'm not familiar enough with the internals of the cart to know what
-		// to test. At this time I'll just test manually.
 	}
 
 }

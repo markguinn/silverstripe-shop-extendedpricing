@@ -17,20 +17,33 @@
 class PriceTier extends DataObject
 {
 	private static $db = array(
-		'Label'     => 'Varchar(255)',
-		'Price'     => 'Currency',
-		'Percentage'=> 'Percentage',
-		'MinQty'    => 'Int',
+		'Label'      => 'Varchar(255)',
+		'Price'      => 'Currency',
+		'Percentage' => 'Percentage',
+		'MinQty'     => 'Int',
 	);
 
 	private static $has_one = array(
-		'Product'   => 'Product',
+		'Product'    => 'Product',
+		'SiteConfig' => 'SiteConfig', // only used for global tiers, if present
 	);
 
 	private static $casting = array(
-		'Price'     => 'Currency',
+		'Price'         => 'Currency',
+		'OriginalPrice' => 'Currency'
 	);
 
 	private static $default_sort = 'MinQty';
+
+
+	/**
+	 * Calculate the price for this tier from a given base price
+	 * @param float $price [optional]
+	 * @return float
+	 */
+	public function calcPrice($price=0.0) {
+		if (!$price) $price = $this->Price;
+		return round($price * $this->Percentage, 2);
+	}
 }
 

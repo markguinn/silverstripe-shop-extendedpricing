@@ -105,3 +105,8 @@ PriceTier:
     Product: =>Product.p2
     Percentage: 0.5
     MinQty: 10
+  p4tier1:
+    Product: =>Product.p4
+    Percentage: 0.8
+    MinQty: 4
+

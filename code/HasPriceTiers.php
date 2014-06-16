@@ -27,15 +27,54 @@ class HasPriceTiers extends DataExtension
 		if (!isset($this->_prices)) {
 			$this->_prices = new ArrayList();
 
+			// Create a base tier
 			$base = new PriceTier();
-			$base->Label  = $this->owner->BasePriceLabel;
-			$base->Price  = $this->owner->sellingPrice();
+			$base->Label = $this->owner->BasePriceLabel;
+			$base->Price = $this->owner->sellingPrice();
 			$base->Percentage = 1;
 			$base->MinQty = 1;
 			$this->_prices->push($base);
 
-			foreach ($this->owner->PriceTiers() as $tier) {
-				if (empty($tier->Price) && !empty($tier->Percentage)) $tier->Price = round($base->Price * $tier->Percentage, 2);
+			// Integrate with promo pricing
+			if ($this->owner->hasExtension('HasPromotionalPricing') && $base->Price != $this->owner->BasePrice) {
+				$base->OriginalPrice = $this->owner->BasePrice;
+			}
+
+			// If this product has tiers, use those
+			$tiers = $this->owner->PriceTiers();
+
+			// If not, see if the parent has tiers
+			if ((!$tiers || !$tiers->exists()) && $this->owner->hasMethod('Parent')) {
+				$parent = $this->owner->Parent();
+				if ($parent && $parent->exists() && $parent->hasExtension('HasPriceTiers')) {
+					$tiers = $parent->PriceTiers();
+					if ($tiers && empty($base->Label) && !empty($parent->BasePriceLabel)) $base->Label = $parent->BasePriceLabel;
+				}
+			}
+
+			// If not, see if there are global tiers
+			if ((!$tiers || !$tiers->exists()) && SiteConfig::has_extension('HasPriceTiers')) {
+				$global = SiteConfig::current_site_config();
+				$tiers  = $global->PriceTiers();
+				if ($tiers && empty($base->Label) && !empty($global->BasePriceLabel)) $base->Label = $global->BasePriceLabel;
+			}
+
+			// Fill in the additional tiers
+			foreach ($tiers as $tier) {
+				/** @var PriceTier $tier */
+				// calculate a price if needed
+				if (empty($tier->Price) && !empty($tier->Percentage)) {
+					$tier->Price = $tier->calcPrice($base->Price);
+				} elseif (!empty($tier->Price) && empty($tier->Percentage)) {
+					$tier->Percentage = $tier->Price / $base->Price;
+				}
+
+				// integrate with promo pricing
+				if ($this->owner->hasExtension('HasPromotionalPricing') && !empty($base->OriginalPrice)) {
+					$tier->OriginalPrice = $tier->calcPrice($base->OriginalPrice);
+				}
+
+				// add it to the stack
 				$this->_prices->push($tier);
 			}
 
@@ -91,11 +130,35 @@ class HasPriceTiers_OrderItem extends DataExtension
 	 */
 	public function updateUnitPrice(&$unitPrice) {
 		$buyable = $this->owner->Buyable();
-		if ($buyable && $buyable->hasExtension('HasPriceTiers')) {
-			$qty = $this->owner->Quantity;
-			$tier = $buyable->getTierForQuantity($qty);
-			if ($tier && $tier->MinQty > 1) $unitPrice = $tier->Price;
+		if (!$buyable) return;
+		$tier = null;
+
+		// Easiest case: the buyable has it's own tiers
+		if ($buyable->hasExtension('HasPriceTiers')) {
+			$tier = $buyable->getTierForQuantity($this->owner->Quantity);
 		}
+
+		// Usually, you'd have one set of tiers on the parent product
+		// which apply to all variations
+		if (!$tier && $buyable instanceof ProductVariation) {
+			$prod = $buyable->Product();
+			if ($prod && $prod->exists() && $prod->hasExtension('HasPriceTiers')) {
+				$tier = $prod->getTierForQuantity($this->owner->Quantity);
+			}
+		}
+
+		// Finally, in some cases (grouped products, primarily) we
+		// would want to get the tiers from a parent
+		if (!$tier && $buyable->hasMethod('Parent')) {
+			$parent = $buyable->Parent();
+			if ($parent && $parent->exists() && $parent->hasExtension('HasPriceTiers')) {
+				echo "{$buyable->ID} parent with tiers\n";
+				$tier = $parent->getTierForQuantity($this->owner->Quantity);
+			}
+		}
+
+		// Finally, if we got a tier and it's not the base tier, change the price
+		if ($tier && $tier->MinQty > 1) $unitPrice = $tier->calcPrice($unitPrice);
 	}
 }
 
