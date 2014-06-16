@@ -5,30 +5,14 @@ Extended Pricing Options for Silverstripe Shop
 
 Provides several options of extended pricing for Buyables.
 
+
 GROUP PRICING
 -------------
 Allows you to define one or more additional levels of pricing
 that take effect based on the group of the logged in user. The
 primary use case is wholesale or corporate pricing.
 
-Price levels are defined via yml config like so:
-
-```
-Product:
-  extensions:
-    - HasGroupPricing
-HasGroupPricing:
-  price_levels:
-    wholesale: WholesalePrice
-    supercheap: SuperCheapPrice
-  field_labels:
-    WholesalePrice: 'Price for wholesale customers'
-    SuperCheapPrice: 'Another level of price'
-```
-
-This will create additional fields in the CMS and on the Product
-record. Product->sellingPrice() will then return the lowest
-applicable price for the current member.
+See docs/en/GroupPricing.md for more infomation.
 
 
 PROMOTIONAL PRICING
@@ -41,34 +25,20 @@ categories.
 - can be absolute price or percentage discount
 - can specify whether to display as a sale (i.e. show old price crossed out)
 
-To use, you must add the 'HasPromotionalPricing' extension at
-whatever levels you want like so:
+See docs/en/PromotionalPricing.md for more information.
 
-```
-Product:
-  extensions:
-    - HasPromotionalPricing
-ProductVariation:
-  extensions:
-    - HasPromotionalPricing
-ProductCategory:
-  extensions:
-    - HasPromotionalPricing
-```
 
-Discounts are then applied on the Pricing tab in the CMS. By default,
-discounts do not compound if they are applied at multiple levels (i.e.
-a $5 discount on the category and a $4 discount on the product would
-only yield $4 discount), but if you wish to change that you can
-use the following config setting:
+TIER PRICING
+------------
+Allows you to see pricing tiers based on how many items a customer purchases.
+For example, a shirt could cost $10 normally, but only $8 if one buys 20 or
+more.
 
-```
-HasPromotionalPricing:
-  compound_discounts: true
-```
+- Can apply a fixed price or percentage
+- Can have global tiers attached to the SiteConfig
+- Can have tiers on a parent product which apply to variations
 
-See the examples in templates/Includes for display. You'll probably
-need to modify your template.
+See docs/en/TierPricing.md for more information.
 
 
 TODO

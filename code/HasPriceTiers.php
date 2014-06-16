@@ -63,9 +63,9 @@ class HasPriceTiers extends DataExtension
 			foreach ($tiers as $tier) {
 				/** @var PriceTier $tier */
 				// calculate a price if needed
-				if (empty($tier->Price) && !empty($tier->Percentage)) {
+				if ($tier->Price == 0 && $tier->Percentage > 0) {
 					$tier->Price = $tier->calcPrice($base->Price);
-				} elseif (!empty($tier->Price) && empty($tier->Percentage)) {
+				} elseif ($tier->Price > 0 && $tier->Percentage == 0) {
 					$tier->Percentage = $tier->Price / $base->Price;
 				}
 
