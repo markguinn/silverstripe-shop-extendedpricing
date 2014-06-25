@@ -10,7 +10,10 @@
 		"homepage": "http://github.com/markguinn"
 	}],
 	"extra": {
-		"installer-name": "shop_extendedpricing"
+		"installer-name": "shop_extendedpricing",
+		"branch-alias": {
+			"dev-master": "1.0.x-dev"
+		}
 	},
 	"require": {
 		"silverstripe/framework": ">=3.1",
