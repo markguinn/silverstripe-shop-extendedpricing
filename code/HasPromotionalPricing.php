@@ -294,7 +294,8 @@ class HasPromotionalPricing extends DataExtension
         // there can be issues with the charged total being different
         // from the saved Total - sometimes by several cents - if
         // we don't round here.
-        $price = round($price, Order::$rounding_precision);
+        $precision = (int)Config::inst()->get('Order', 'rounding_precision');
+        $price = round($price, $precision ? $precision : 2);
 
 		if ($price < 0) $price = 0;
 		return true;
