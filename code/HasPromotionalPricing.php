@@ -291,6 +291,11 @@ class HasPromotionalPricing extends DataExtension
 			$price -= $obj->PromoAmount;
 		}
 
+        // there can be issues with the charged total being different
+        // from the saved Total - sometimes by several cents - if
+        // we don't round here.
+        $price = round($price, Order::$rounding_precision);
+
 		if ($price < 0) $price = 0;
 		return true;
 	}
