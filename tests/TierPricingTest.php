@@ -85,6 +85,7 @@ class TierPricingTest extends SapphireTest
 		$qty   = 4;
 		$this->assertEquals($price, $this->p2->BasePrice);
 		ShoppingCart::singleton()->add($this->p2, $qty);
+		ShoppingCart::curr()->calculate();
 		$this->assertEquals($price * $qty, ShoppingCart::curr()->SubTotal());
 	}
 
@@ -93,6 +94,7 @@ class TierPricingTest extends SapphireTest
 		$qty   = 5;
 		$this->assertEquals($price, $this->p2->getPrices()->offsetGet(1)->Price);
 		ShoppingCart::singleton()->add($this->p2, $qty);
+		ShoppingCart::curr()->calculate();
 		$this->assertEquals($price * $qty, ShoppingCart::curr()->SubTotal());
 	}
 
@@ -101,6 +103,7 @@ class TierPricingTest extends SapphireTest
 		$qty   = 10;
 		$this->assertEquals($price, $this->p2->getPrices()->offsetGet(2)->Price);
 		ShoppingCart::singleton()->add($this->p2, $qty);
+		ShoppingCart::curr()->calculate();
 		$this->assertEquals($price * $qty, ShoppingCart::curr()->SubTotal());
 	}
 
@@ -121,8 +124,10 @@ class TierPricingTest extends SapphireTest
 		$price2 = 16;
 		$qty2   = 4;
 		ShoppingCart::singleton()->add($this->v1, $qty1);
+		ShoppingCart::curr()->calculate();
 		$this->assertEquals($price1 * $qty1, ShoppingCart::curr()->SubTotal());
 		ShoppingCart::singleton()->setQuantity($this->v1, $qty2);
+		ShoppingCart::curr()->calculate();
 		$this->assertEquals($price2 * $qty2, ShoppingCart::curr()->SubTotal());
 	}
 
@@ -139,6 +144,7 @@ class TierPricingTest extends SapphireTest
 		$this->assertEquals($price, $tiers->offsetGet(2)->Price);
 
 		ShoppingCart::singleton()->add($this->p1, $qty);
+		ShoppingCart::curr()->calculate();
 		$this->assertEquals($price * $qty, ShoppingCart::curr()->SubTotal());
 	}
 
@@ -158,6 +164,7 @@ class TierPricingTest extends SapphireTest
 		$this->assertEquals(7.50, $tiers->offsetGet(2)->OriginalPrice);
 
 		ShoppingCart::singleton()->add($this->p2, $qty);
+		ShoppingCart::curr()->calculate();
 		$this->assertEquals($price * $qty, ShoppingCart::curr()->SubTotal());
 	}
 
@@ -178,8 +185,10 @@ class TierPricingTest extends SapphireTest
 		$qty2   = 20;
 
 		ShoppingCart::singleton()->add($this->p1, $qty1);
+		ShoppingCart::curr()->calculate();
 		$this->assertEquals($price1 * $qty1, ShoppingCart::curr()->SubTotal());
 		ShoppingCart::singleton()->setQuantity($this->p1, $qty2);
+		ShoppingCart::curr()->calculate();
 		$this->assertEquals($price2 * $qty2, ShoppingCart::curr()->SubTotal());
 	}
 }

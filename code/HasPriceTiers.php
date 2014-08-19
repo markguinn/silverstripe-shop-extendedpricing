@@ -65,8 +65,12 @@ class HasPriceTiers extends DataExtension
 				// calculate a price if needed
 				if ($tier->Price == 0 && $tier->Percentage > 0) {
 					$tier->Price = $tier->calcPrice($base->Price);
-				} elseif ($tier->Price > 0 && $tier->Percentage == 0) {
-					$tier->Percentage = $tier->Price / $base->Price;
+				} elseif ($tier->Price > 0 && $tier->Percentage == 0 && $base->Price > 0) {
+					$price = $tier->Price;
+					$this->owner->extend('updateSellingPrice', $price); // make sure discounts still apply
+					$price = $price < 0 ? 0 : $price;
+					$tier->Price = $price;
+					$tier->Percentage = $price / $base->Price;
 				}
 
 				// integrate with promo pricing
@@ -152,13 +156,29 @@ class HasPriceTiers_OrderItem extends DataExtension
 		if (!$tier && $buyable->hasMethod('Parent')) {
 			$parent = $buyable->Parent();
 			if ($parent && $parent->exists() && $parent->hasExtension('HasPriceTiers')) {
-				echo "{$buyable->ID} parent with tiers\n";
+//				echo "{$buyable->ID} parent with tiers\n";
 				$tier = $parent->getTierForQuantity($this->owner->Quantity);
 			}
 		}
 
 		// Finally, if we got a tier and it's not the base tier, change the price
 		if ($tier && $tier->MinQty > 1) $unitPrice = $tier->calcPrice($unitPrice);
+	}
+
+
+	/**
+	 * The shop module won't recalculate the unitprice twice in one request (a good thing)
+	 * But currently the ->add method first adds with a quantity of 1 and then sets the quantity,
+	 * however the unitprice ends up getting calculated in there while the qty=1 and never
+	 * recalculated. That's a safe assumption generally but it breaks tier pricing so we
+	 * have to check here and force it to recalculate.
+	 */
+	public function onBeforeWrite() {
+		if ($this->owner->isChanged('Quantity') && $this->owner->Quantity != 1) {
+			// force unitprice to be recalculated
+			$this->owner->setUnitPrice(0);
+			$this->owner->UnitPrice();
+		}
 	}
 }
 
