@@ -122,7 +122,16 @@ class HasPriceTiers extends DataExtension
 	}
 
 
-	// TODO: updateCMSFields
+	/**
+	 * @param FieldList $fields
+	 */
+	public function updateCMSFields(FieldList $fields) {
+		$baseLabel = TextField::create('BasePriceLabel', 'Label for Base Tier');
+		$bp = $fields->fieldByName('Root.Pricing.BasePrice');
+		if ($bp) {
+			$fields->addFieldToTab('Root.Pricing', $baseLabel, 'BasePrice');
+		}
+	}
 
 }
 
@@ -174,7 +183,12 @@ class HasPriceTiers_OrderItem extends DataExtension
 	 * have to check here and force it to recalculate.
 	 */
 	public function onBeforeWrite() {
-		if ($this->owner->isChanged('Quantity') && $this->owner->Quantity != 1) {
+		if (
+			ShoppingCart::curr() &&
+			$this->owner->OrderID == ShoppingCart::curr()->ID &&
+			$this->owner->isChanged('Quantity') &&
+			$this->owner->Quantity != 1
+		) {
 			// force unitprice to be recalculated
 			$this->owner->setUnitPrice(0);
 			$this->owner->UnitPrice();
