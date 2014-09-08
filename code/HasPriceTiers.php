@@ -182,18 +182,18 @@ class HasPriceTiers_OrderItem extends DataExtension
 	 * recalculated. That's a safe assumption generally but it breaks tier pricing so we
 	 * have to check here and force it to recalculate.
 	 */
-	public function onBeforeWrite() {
-		if (
-			ShoppingCart::curr() &&
-			$this->owner->OrderID == ShoppingCart::curr()->ID &&
-			$this->owner->isChanged('Quantity') &&
-			$this->owner->Quantity != 1
-		) {
-			// force unitprice to be recalculated
-			$this->owner->setUnitPrice(0);
-			$this->owner->UnitPrice();
-		}
-	}
+//	public function onBeforeWrite() {
+//		if (
+//			ShoppingCart::curr() &&
+//			$this->owner->OrderID == ShoppingCart::curr()->ID &&
+//			$this->owner->isChanged('Quantity') &&
+//			$this->owner->Quantity != 1
+//		) {
+//			// force unitprice to be recalculated
+//			$this->owner->setUnitPrice(0);
+//			$this->owner->UnitPrice();
+//		}
+//	}
 }
 
 
