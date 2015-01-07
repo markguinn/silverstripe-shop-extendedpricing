@@ -126,11 +126,21 @@ class HasPriceTiers extends DataExtension
 	 * @param FieldList $fields
 	 */
 	public function updateCMSFields(FieldList $fields) {
-		$baseLabel = TextField::create('BasePriceLabel', 'Label for Base Tier');
-		$bp = $fields->fieldByName('Root.Pricing.BasePrice');
-		if ($bp) {
+		// Base price label
+		if ($bp = $fields->fieldByName('Root.Pricing.BasePrice')) {
+			$baseLabel = TextField::create('BasePriceLabel', 'Label for Base Tier');
 			$fields->addFieldToTab('Root.Pricing', $baseLabel, 'BasePrice');
 		}
+
+		// Price tier grid
+		$fields->addFieldToTab('Root.Pricing',
+			GridField::create(
+				'PriceTiers',
+				$this->owner instanceof SiteConfig ? 'Global Price Tiers' : 'Price Tiers',
+				$this->owner->PriceTiers(),
+				GridFieldConfig_RelationEditor::create()
+			)
+		);
 	}
 
 }
