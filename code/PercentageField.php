@@ -16,7 +16,7 @@ class PercentageField extends NumericField
 		return 'percentage numeric text';
 	}
 
-	public function setValue($val) {
+	public function setValue($val, $data = array()) {
 		if (strpos($val, '%') !== false || (double)$val > 1 || (double)$val < -1) {
 			$val = (double)$val / 100.0;
 		}
