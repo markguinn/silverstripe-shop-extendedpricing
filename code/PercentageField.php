@@ -16,19 +16,45 @@ class PercentageField extends NumericField
 		return 'percentage numeric text';
 	}
 
+
+	/**
+	 * @param mixed $val
+	 * @param array $data
+	 * @return $this
+	 */
 	public function setValue($val, $data = array()) {
-		if (strpos($val, '%') !== false || (double)$val > 1 || (double)$val < -1) {
-			$val = (double)$val / 100.0;
+		// convert to a number
+		parent::setValue(str_replace('%', '', $val));
+		$dataVal = $this->dataValue();
+
+		// divide by 100 if needed and set again
+		if (strpos($val, '%') !== false || $dataVal > 1 || $dataVal < -1) {
+			$dataVal = (double)$dataVal / 100.0;
+			parent::setValue($dataVal);
 		}
 
-		return parent::setValue($val);
+		return $this;
 	}
 
-	public function dataValue() {
-		return (is_numeric($this->value)) ? $this->value : 0;
-	}
 
+	/**
+	 * @return string
+	 * @throws Zend_Locale_Exception
+	 */
 	public function Value() {
-		return ($this->dataValue() * 100.0) . '%';
+		if(!$this->isNumeric()) return '0%';
+		require_once "Zend/Locale/Format.php";
+		$locale = new Zend_Locale($this->getLocale());
+
+		// convert from the stored format to a real number so we can multiply
+		$number = Zend_Locale_Format::getNumber(
+			$this->clean($this->value),
+			array('locale' => $locale)
+		);
+		$number *= 100.0;
+
+		// convert back to string
+		$val = Zend_Locale_Format::toNumber($number, array('locale' => $locale));
+		return $val . '%';
 	}
 }
