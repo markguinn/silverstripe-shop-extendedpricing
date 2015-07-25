@@ -12,6 +12,8 @@ matrix:
   include:
     - php: 5.6
       env: DB=MYSQL CORE_RELEASE=3.2
+  allow_failures:
+    - env: DB=MYSQL CORE_RELEASE=3.2
 
 before_script:
  - pear -q install --onlyreqdeps pear/PHP_CodeSniffer
