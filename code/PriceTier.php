@@ -16,53 +16,56 @@
  */
 class PriceTier extends DataObject
 {
-	private static $db = array(
-		'Label'      => 'Varchar(255)',
-		'Price'      => 'Currency',
-		'Percentage' => 'Percentage',
-		'MinQty'     => 'Int',
-	);
+    private static $db = array(
+        'Label'      => 'Varchar(255)',
+        'Price'      => 'Currency',
+        'Percentage' => 'Percentage',
+        'MinQty'     => 'Int',
+    );
 
-	private static $has_one = array(
-		'Product'    => 'Product',
-		'SiteConfig' => 'SiteConfig', // only used for global tiers, if present
-	);
+    private static $has_one = array(
+        'Product'    => 'Product',
+        'SiteConfig' => 'SiteConfig', // only used for global tiers, if present
+    );
 
-	private static $casting = array(
-		'Price'         => 'Currency',
-		'OriginalPrice' => 'Currency'
-	);
+    private static $casting = array(
+        'Price'         => 'Currency',
+        'OriginalPrice' => 'Currency'
+    );
 
-	private static $default_sort = 'MinQty';
+    private static $default_sort = 'MinQty';
 
-	private static $summary_fields = array(
-		'MinQty'     => 'Min. Qty.',
-		'Label'      => 'Label',
-		'Price'      => 'Price',
-		'Percentage' => 'Percentage',
-	);
+    private static $summary_fields = array(
+        'MinQty'     => 'Min. Qty.',
+        'Label'      => 'Label',
+        'Price'      => 'Price',
+        'Percentage' => 'Percentage',
+    );
 
-	private static $searchable_fields = array('MinQty', 'Label', 'Price', 'Percentage');
-
-
-	/**
-	 * Calculate the price for this tier from a given base price
-	 * @param float $price [optional]
-	 * @return float
-	 */
-	public function calcPrice($price=0.0) {
-		if (!$price) $price = $this->Price;
-		return round($price * $this->Percentage, 2);
-	}
+    private static $searchable_fields = array('MinQty', 'Label', 'Price', 'Percentage');
 
 
-	/**
-	 * @return FieldList
-	 */
-	public function getCMSFields() {
-		$fields = parent::getCMSFields();
-		$fields->removeByName(array('ProductID', 'SiteConfigID'));
-		return $fields;
-	}
+    /**
+     * Calculate the price for this tier from a given base price
+     * @param float $price [optional]
+     * @return float
+     */
+    public function calcPrice($price=0.0)
+    {
+        if (!$price) {
+            $price = $this->Price;
+        }
+        return round($price * $this->Percentage, 2);
+    }
+
+
+    /**
+     * @return FieldList
+     */
+    public function getCMSFields()
+    {
+        $fields = parent::getCMSFields();
+        $fields->removeByName(array('ProductID', 'SiteConfigID'));
+        return $fields;
+    }
 }
-
