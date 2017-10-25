@@ -191,7 +191,7 @@ class HasPromotionalPricing extends DataExtension
         }
 
         // try to serve from the cache
-        if (PriceCache::inst()->fetch($this->owner, 'Promo', $price)) {
+        if (!$this->owner->hasExtension('HasPriceTiers') && PriceCache::inst()->fetch($this->owner, 'Promo', $price)) {
             return;
         }
 
