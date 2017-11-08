@@ -35,6 +35,16 @@ class HasPriceTiers extends DataExtension
             $base->Percentage = 1;
             $base->MinQty = 1;
             $this->_prices->push($base);
+            
+            // Integrate with Product Variations
+            if (
+                $this->owner->hasExtension('ProductVariationsExtension')
+                && ($variations = $this->owner->Variations())
+                && $variations->exists()
+                && $base->Price == 0
+            ) {
+                $base->Price = $variations->min('Price');
+            }
 
             // Integrate with promo pricing
             if ($this->owner->hasExtension('HasPromotionalPricing') && $base->Price != $this->owner->BasePrice) {
