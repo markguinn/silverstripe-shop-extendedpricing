@@ -34,7 +34,6 @@ class PercentageField extends NumericField
             $dataVal = (double)$dataVal / 100.0;
             parent::setValue($dataVal);
         }
-
         return $this;
     }
 
@@ -45,15 +44,12 @@ class PercentageField extends NumericField
      */
     public function Value()
     {
-        if (!$this->isNumeric()) {
-            return '0%';
-        }
         require_once "Zend/Locale/Format.php";
         $locale = new Zend_Locale($this->getLocale());
 
         // convert from the stored format to a real number so we can multiply
         $number = Zend_Locale_Format::getNumber(
-            $this->clean($this->value),
+            (float)$this->clean($this->value),
             array('locale' => $locale)
         );
         $number *= 100.0;
